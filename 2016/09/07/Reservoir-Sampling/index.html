@@ -1,91 +1,222 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8">
-  
-  <title>蓄水池抽样（Reservoir Sampling） | Hexo</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="最近看到一个问题，从一个位置数量的物体中等概率抽出某个物体，而这个数量随时在不断增加。查了下相关文献，发现有这个一个有趣的办法可以解决，蓄水池抽样。蓄水池抽样（Reservoir Sampling ）是一个很有趣的问题，它能够在o（n）时间内对n个数据进行等概率随机抽取，例如：从1000个数据中等概率随机抽取出100个。另外，如果数据集合的量特别大或者还在增长（相当于未知数据集合总量），该算法依然">
+    <meta charset="utf-8">
+    
+    <title>蓄水池抽样（Reservoir Sampling） | 时光</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="最近看到一个问题，从一个位置数量的物体中等概率抽出某个物体，而这个数量随时在不断增加。查了下相关文献，发现有这个一个有趣的办法可以解决，蓄水池抽样。蓄水池抽样（Reservoir Sampling ）是一个很有趣的问题，它能够在o（n）时间内对n个数据进行等概率随机抽取，例如：从1000个数据中等概率随机抽取出100个。另外，如果数据集合的量特别大或者还在增长（相当于未知数据集合总量），该算法依然">
 <meta property="og:type" content="article">
 <meta property="og:title" content="蓄水池抽样（Reservoir Sampling）">
 <meta property="og:url" content="http://yoursite.com/2016/09/07/Reservoir-Sampling/index.html">
-<meta property="og:site_name" content="Hexo">
+<meta property="og:site_name" content="时光">
 <meta property="og:description" content="最近看到一个问题，从一个位置数量的物体中等概率抽出某个物体，而这个数量随时在不断增加。查了下相关文献，发现有这个一个有趣的办法可以解决，蓄水池抽样。蓄水池抽样（Reservoir Sampling ）是一个很有趣的问题，它能够在o（n）时间内对n个数据进行等概率随机抽取，例如：从1000个数据中等概率随机抽取出100个。另外，如果数据集合的量特别大或者还在增长（相当于未知数据集合总量），该算法依然">
 <meta property="og:updated_time" content="2016-07-30T08:21:26.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="蓄水池抽样（Reservoir Sampling）">
 <meta name="twitter:description" content="最近看到一个问题，从一个位置数量的物体中等概率抽出某个物体，而这个数量随时在不断增加。查了下相关文献，发现有这个一个有趣的办法可以解决，蓄水池抽样。蓄水池抽样（Reservoir Sampling ）是一个很有趣的问题，它能够在o（n）时间内对n个数据进行等概率随机抽取，例如：从1000个数据中等概率随机抽取出100个。另外，如果数据集合的量特别大或者还在增长（相当于未知数据集合总量），该算法依然">
-  
-    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
-  
-  
-    <link rel="icon" href="/favicon.png">
-  
-  
-    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
-  
-  <link rel="stylesheet" href="/css/style.css">
-  
+    
+
+    
+        <link rel="alternate" href="http://weibo.com/wenbo2018" title="时光" type="application/atom+xml" />
+    
+
+    
+
+    <link rel="stylesheet" href="/vendor/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/vendor/open-sans/styles.css">
+    <link rel="stylesheet" href="/vendor/source-code-pro/styles.css">
+
+    <link rel="stylesheet" href="/css/style.css">
+
+    <script src="/vendor/jquery/2.1.3/jquery.min.js"></script>
+    
+    
+        <link rel="stylesheet" href="/vendor/fancybox/jquery.fancybox.css">
+    
+    
+    
+    
 
 </head>
 
 <body>
-  <div id="container">
-    <div id="wrap">
-      <header id="header">
-  <div id="banner"></div>
-  <div id="header-outer" class="outer">
-    <div id="header-title" class="inner">
-      <h1 id="logo-wrap">
-        <a href="/" id="logo">Hexo</a>
-      </h1>
-      
-    </div>
-    <div id="header-inner" class="inner">
-      <nav id="main-nav">
-        <a id="main-nav-toggle" class="nav-icon"></a>
-        
-          <a class="main-nav-link" href="/">Home</a>
-        
-          <a class="main-nav-link" href="/archives">Archives</a>
-        
-      </nav>
-      <nav id="sub-nav">
-        
-          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
-        
-        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
-      </nav>
-      <div id="search-form-wrap">
-        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" results="0" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
-      </div>
-    </div>
-  </div>
-</header>
-      <div class="outer">
-        <section id="main"><article id="post-Reservoir-Sampling" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2016/09/07/Reservoir-Sampling/" class="article-date">
-  <time datetime="2016-09-07T05:53:16.275Z" itemprop="datePublished">2016-09-07</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 class="article-title" itemprop="name">
-      蓄水池抽样（Reservoir Sampling）
-    </h1>
-  
+    <div id="container">
+        <header id="header">
+    <div id="header-main" class="header-inner">
+        <div class="outer">
+            <a href="/" id="logo">
+                <i class="logo"></i>
+                <span class="site-title">时光</span>
+            </a>
+            <nav id="main-nav">
+                
+                    <a class="main-nav-link" href="/.">首页</a>
+                
+                    <a class="main-nav-link" href="/archives">归档</a>
+                
+                    <a class="main-nav-link" href="/tags">标签</a>
+                
+                    <a class="main-nav-link" href="/about">关于</a>
+                
+            </nav>
+            
+                
+                <nav id="sub-nav">
+                    <div class="profile" id="profile-nav">
+                        <a id="profile-anchor" href="javascript:;">
+                            <img class="avatar" src="/css/images/avatar.png" />
+                            <i class="fa fa-caret-down"></i>
+                        </a>
+                    </div>
+                </nav>
+            
+            <div id="search-form-wrap">
 
-      </header>
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="Search" />
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="Type something..." />
+            <span class="ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: 'Posts',
+            PAGES: 'Pages',
+            CATEGORIES: 'Categories',
+            TAGS: 'Tags',
+            UNTITLED: '(Untitled)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+<script src="/js/insight.js"></script>
+
+</div>
+        </div>
+    </div>
+    <div id="main-nav-mobile" class="header-sub header-inner">
+        <table class="menu outer">
+            <tr>
+                
+                    <td><a class="main-nav-link" href="/.">首页</a></td>
+                
+                    <td><a class="main-nav-link" href="/archives">归档</a></td>
+                
+                    <td><a class="main-nav-link" href="/tags">标签</a></td>
+                
+                    <td><a class="main-nav-link" href="/about">关于</a></td>
+                
+                <td>
+                    
+    <div class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="Search" />
+    </div>
+
+                </td>
+            </tr>
+        </table>
+    </div>
+</header>
+
+        <div class="outer">
+            
+                
+
+<aside id="profile">
+    <div class="inner profile-inner">
+        <div class="base-info profile-block">
+            <img id="avatar" src="/css/images/avatar.png" />
+            <h2 id="name">时光</h2>
+            <h3 id="title">Java Developer &amp;  Machine Learning</h3>
+            <span id="location"><i class="fa fa-map-marker"></i>Guangzhou, China</span>
+            <a id="follow" target="_blank" href="https://github.com/wenbo2018/">关注我</a>
+        </div>
+        <div class="article-info profile-block">
+            <div class="article-info-block">
+                3
+                <span>文章</span>
+            </div>
+            <div class="article-info-block">
+                0
+                <span>tag</span>
+            </div>
+        </div>
+        
+        <div class="profile-block social-links">
+            <table>
+                <tr>
+                    
+                    
+                    <td>
+                        <a href="http://github.com/wenbo2018/" target="_blank" title="github" class=tooltip>
+                            <i class="fa fa-github"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="http://weibo.com/wenbo2018" target="_blank" title="rss" class=tooltip>
+                            <i class="fa fa-rss"></i>
+                        </a>
+                    </td>
+                    
+                </tr>
+            </table>
+        </div>
+        
+    </div>
+</aside>
+
+            
+            <section id="main"><article id="post-Reservoir-Sampling" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+        
+            <header class="article-header">
+                
     
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h3 id="最近看到一个问题，从一个位置数量的物体中等概率抽出某个物体，而这个数量随时在不断增加。查了下相关文献，发现有这个一个有趣的办法可以解决，蓄水池抽样。蓄水池抽样（Reservoir-Sampling-）是一个很有趣的问题，它能够在o（n）时间内对n个数据进行等概率随机抽取，例如：从1000个数据中等概率随机抽取出100个。另外，如果数据集合的量特别大或者还在增长（相当于未知数据集合总量），该算法依然可以等概率抽样。这个问题在编程珠玑里面引出来的，之前看过编程珠玑并没有发现这个例子，难道是我那本书没有还是看书不认真？是这样描述的："><a href="#最近看到一个问题，从一个位置数量的物体中等概率抽出某个物体，而这个数量随时在不断增加。查了下相关文献，发现有这个一个有趣的办法可以解决，蓄水池抽样。蓄水池抽样（Reservoir-Sampling-）是一个很有趣的问题，它能够在o（n）时间内对n个数据进行等概率随机抽取，例如：从1000个数据中等概率随机抽取出100个。另外，如果数据集合的量特别大或者还在增长（相当于未知数据集合总量），该算法依然可以等概率抽样。这个问题在编程珠玑里面引出来的，之前看过编程珠玑并没有发现这个例子，难道是我那本书没有还是看书不认真？是这样描述的：" class="headerlink" title="最近看到一个问题，从一个位置数量的物体中等概率抽出某个物体，而这个数量随时在不断增加。查了下相关文献，发现有这个一个有趣的办法可以解决，蓄水池抽样。蓄水池抽样（Reservoir Sampling ）是一个很有趣的问题，它能够在o（n）时间内对n个数据进行等概率随机抽取，例如：从1000个数据中等概率随机抽取出100个。另外，如果数据集合的量特别大或者还在增长（相当于未知数据集合总量），该算法依然可以等概率抽样。这个问题在编程珠玑里面引出来的，之前看过编程珠玑并没有发现这个例子，难道是我那本书没有还是看书不认真？是这样描述的："></a>最近看到一个问题，从一个位置数量的物体中等概率抽出某个物体，而这个数量随时在不断增加。查了下相关文献，发现有这个一个有趣的办法可以解决，蓄水池抽样。蓄水池抽样（Reservoir Sampling ）是一个很有趣的问题，它能够在o（n）时间内对n个数据进行等概率随机抽取，例如：从1000个数据中等概率随机抽取出100个。另外，如果数据集合的量特别大或者还在增长（相当于未知数据集合总量），该算法依然可以等概率抽样。这个问题在编程珠玑里面引出来的，之前看过编程珠玑并没有发现这个例子，难道是我那本书没有还是看书不认真？是这样描述的：</h3><p>　　How could you select one of n objects at random, where you see the objects sequentially but you do not know the value of n beforehand? For concreteness, how would you read a text file, and select and print one random line, when you don’t know the number of lines in advance?<br>　　问题定义可以简化如下：在不知道文件总行数的情况下，如何从文件中随机的抽取一行？</p>
+        <h1 class="article-title" itemprop="name">
+            蓄水池抽样（Reservoir Sampling）
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2016/09/07/Reservoir-Sampling/">
+            <time datetime="2016-09-07T05:53:16.275Z" itemprop="datePublished">2016-09-07</time>
+        </a>
+    </div>
+
+
+                        
+                        
+                    </div>
+                
+            </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <h3 id="最近看到一个问题，从一个位置数量的物体中等概率抽出某个物体，而这个数量随时在不断增加。查了下相关文献，发现有这个一个有趣的办法可以解决，蓄水池抽样。蓄水池抽样（Reservoir-Sampling-）是一个很有趣的问题，它能够在o（n）时间内对n个数据进行等概率随机抽取，例如：从1000个数据中等概率随机抽取出100个。另外，如果数据集合的量特别大或者还在增长（相当于未知数据集合总量），该算法依然可以等概率抽样。这个问题在编程珠玑里面引出来的，之前看过编程珠玑并没有发现这个例子，难道是我那本书没有还是看书不认真？是这样描述的："><a href="#最近看到一个问题，从一个位置数量的物体中等概率抽出某个物体，而这个数量随时在不断增加。查了下相关文献，发现有这个一个有趣的办法可以解决，蓄水池抽样。蓄水池抽样（Reservoir-Sampling-）是一个很有趣的问题，它能够在o（n）时间内对n个数据进行等概率随机抽取，例如：从1000个数据中等概率随机抽取出100个。另外，如果数据集合的量特别大或者还在增长（相当于未知数据集合总量），该算法依然可以等概率抽样。这个问题在编程珠玑里面引出来的，之前看过编程珠玑并没有发现这个例子，难道是我那本书没有还是看书不认真？是这样描述的：" class="headerlink" title="最近看到一个问题，从一个位置数量的物体中等概率抽出某个物体，而这个数量随时在不断增加。查了下相关文献，发现有这个一个有趣的办法可以解决，蓄水池抽样。蓄水池抽样（Reservoir Sampling ）是一个很有趣的问题，它能够在o（n）时间内对n个数据进行等概率随机抽取，例如：从1000个数据中等概率随机抽取出100个。另外，如果数据集合的量特别大或者还在增长（相当于未知数据集合总量），该算法依然可以等概率抽样。这个问题在编程珠玑里面引出来的，之前看过编程珠玑并没有发现这个例子，难道是我那本书没有还是看书不认真？是这样描述的："></a>最近看到一个问题，从一个位置数量的物体中等概率抽出某个物体，而这个数量随时在不断增加。查了下相关文献，发现有这个一个有趣的办法可以解决，蓄水池抽样。蓄水池抽样（Reservoir Sampling ）是一个很有趣的问题，它能够在o（n）时间内对n个数据进行等概率随机抽取，例如：从1000个数据中等概率随机抽取出100个。另外，如果数据集合的量特别大或者还在增长（相当于未知数据集合总量），该算法依然可以等概率抽样。这个问题在编程珠玑里面引出来的，之前看过编程珠玑并没有发现这个例子，难道是我那本书没有还是看书不认真？是这样描述的：</h3><p>　　How could you select one of n objects at random, where you see the objects sequentially but you do not know the value of n beforehand? For concreteness, how would you read a text file, and select and print one random line, when you don’t know the number of lines in advance?<br>　　问题定义可以简化如下：在不知道文件总行数的情况下，如何从文件中随机的抽取一行？</p>
 <p>　　首先想到的是我们做过类似的题目吗?当然，在知道文件行数的情况下，我们可以很容易的用C运行库的rand函数随机的获得一个行数，从而随机的取出一行，但是，当前的情况是不知道行数，这样如何求呢？我们需要一个概念来帮助我们做出猜想，来使得对每一行取出的概率相等，也即随机。这个概念即蓄水池抽样（Reservoir Sampling）。</p>
 <p>　　有了这个概念，我们便有了这样一个解决方案：定义取出的行号为choice，第一次直接以第一行作为取出行 choice ，而后第二次以二分之一概率决定是否用第二行替换 choice ，第三次以三分之一的概率决定是否以第三行替换 choice ……，以此类推，可用伪代码描述如下：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">i = 0</div><div class="line"></div><div class="line"><span class="keyword">while</span> more input lines</div><div class="line">       with probability 1.0/++i</div><div class="line">       choice = this input line</div><div class="line"><span class="built_in">print</span> choice</div></pre></td></tr></table></figure></p>
 <p>　　这种方法的巧妙之处在于成功的构造出了一种方式使得最后可以证明对每一行的取出概率都为1/n（其中n为当前扫描到的文件行数），换句话说对每一行取出的概率均相等，也即完成了随机的选取。</p>
@@ -96,105 +227,229 @@
 <p>　　证明如下：<br>　　蓄水池抽样问题是一类问题，在这里总结一下，并由衷的感叹这种方法之巧妙，不过对于这种思想产生的源头还是发觉不够，如果能够知道为什么以及怎么样想到这个解决方法的，定会更加有意义。</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div></pre></td><td class="code"><pre><div class="line">import java.util.Arrays;  </div><div class="line">import java.util.Random;  </div><div class="line">public class ReservoirSampling &#123;  </div><div class="line"></div><div class="line">    </div><div class="line">    /** </div><div class="line">     * 题目：给定一个数据流，其中包含无穷尽的搜索关键字（比如，人们在谷歌搜索时不断输入的关键字）。 </div><div class="line">     * 如何才能从这个无穷尽的流中随机的选取1000个关键字？ </div><div class="line">     * Reservoir Sampling </div><div class="line">     */  </div><div class="line">    public static void main(String[] args) &#123;  </div><div class="line">        int k=100;  </div><div class="line">        int n=1000;  </div><div class="line">        int[] data=new int[n];  </div><div class="line">        <span class="keyword">for</span>(int i=0;i&lt;n;i++)&#123;  </div><div class="line">            data[i]=i;  </div><div class="line">        &#125;  </div><div class="line">        int[] sample=reservoirSampling(data,k);  </div><div class="line">        System.out.println(Arrays.toString(sample));  </div><div class="line">    &#125;  </div><div class="line">      </div><div class="line">    public static int[] reservoirSampling(int[] data,int k)&#123;  </div><div class="line">        <span class="keyword">if</span>(data==null)&#123;  </div><div class="line">            <span class="built_in">return</span> new int[0];//In &lt;Effective Java&gt;,it advises to <span class="built_in">return</span> int[0] instead of null.Am i doing right <span class="keyword">in</span> this <span class="keyword">case</span>?  </div><div class="line">        &#125;  </div><div class="line">        <span class="keyword">if</span>(data.length&lt;k)&#123;  </div><div class="line">            <span class="built_in">return</span> new int[0];  </div><div class="line">        &#125;  </div><div class="line">        int[] sample=new int[k];  </div><div class="line">        int n=data.length;  </div><div class="line">        <span class="keyword">for</span>(int i=0;i&lt;n;i++)&#123;  </div><div class="line">            <span class="keyword">if</span>(i&lt;k)&#123;  </div><div class="line">                sample[i]=data[i];  </div><div class="line">            &#125;<span class="keyword">else</span>&#123;  </div><div class="line">                int j=new Random().nextInt(i);  </div><div class="line">                <span class="keyword">if</span>(j&lt;k)&#123;  </div><div class="line">                    sample[j]=data[i];  </div><div class="line">                &#125;  </div><div class="line">            &#125;  </div><div class="line">        &#125;  </div><div class="line">        <span class="built_in">return</span> sample;  </div><div class="line">    &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
 
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2016/09/07/Reservoir-Sampling/" data-id="citmb3suz0000bsq2o887bf2g" class="article-share-link">Share</a>
-      
-      
-    </footer>
-  </div>
-  
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="http://yoursite.com/2016/09/07/Reservoir-Sampling/" data-id="citmbdudu0000f4q2bbkp6p1x" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
     
+
+        </footer>
+    </div>
+    
+        
 <nav id="article-nav">
-  
-  
-    <a href="/2016/09/07/hello-world/" id="article-nav-older" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">Older</strong>
-      <div class="article-nav-title">Hello World</div>
-    </a>
-  
+    
+    
+        <a href="/2016/09/07/hello-world/" id="article-nav-older" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">Older</strong>
+            <div class="article-nav-title">Hello World</div>
+        </a>
+    
 </nav>
 
-  
+
+    
 </article>
 
+
+    
+    <section id="comments">
+    
+    </section>
+
 </section>
+            
+                <aside id="sidebar">
+   
         
-          <aside id="sidebar">
-  
+    <div class="widget-wrap">
+        <h3 class="widget-title">recent</h3>
+        <div class="widget">
+            <ul id="recent-post" class="">
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2016/09/07/Reservoir-Sampling/" class="thumbnail">
     
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
 
-  
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2016/09/07/Reservoir-Sampling/" class="title">蓄水池抽样（Reservoir Sampling）</a></p>
+                            <p class="item-date"><time datetime="2016-09-07T05:53:16.275Z" itemprop="datePublished">2016-09-07</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2016/09/07/hello-world/" class="thumbnail">
     
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
 
-  
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2016/09/07/hello-world/" class="title">Hello World</a></p>
+                            <p class="item-date"><time datetime="2016-09-07T05:53:16.265Z" itemprop="datePublished">2016-09-07</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2016/09/07/dubbo-rpc/" class="thumbnail">
     
-  
     
-  <div class="widget-wrap">
-    <h3 class="widget-title">Archives</h3>
-    <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">September 2016</a></li></ul>
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2016/09/07/dubbo-rpc/" class="title">Hello World</a></p>
+                            <p class="item-date"><time datetime="2016-09-07T05:53:16.255Z" itemprop="datePublished">2016-09-07</time></p>
+                        </div>
+                    </li>
+                
+            </ul>
+        </div>
     </div>
-  </div>
 
-
-  
     
-  <div class="widget-wrap">
-    <h3 class="widget-title">Recent Posts</h3>
-    <div class="widget">
-      <ul>
         
-          <li>
-            <a href="/2016/09/07/Reservoir-Sampling/">蓄水池抽样（Reservoir Sampling）</a>
-          </li>
+    
         
-          <li>
-            <a href="/2016/09/07/hello-world/">Hello World</a>
-          </li>
-        
-          <li>
-            <a href="/2016/09/07/dubbo-rpc/">Hello World</a>
-          </li>
-        
-      </ul>
+    <div class="widget-wrap">
+        <h3 class="widget-title">archives</h3>
+        <div class="widget">
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">September 2016</a><span class="archive-list-count">3</span></li></ul>
+        </div>
     </div>
-  </div>
 
-  
+    
+        
+    
+        
+    
+        
+    <div class="widget-wrap widget-list">
+        <h3 class="widget-title">links</h3>
+        <div class="widget">
+            <ul>
+                
+            </ul>
+        </div>
+    </div>
+
+
+    
+    <div id="toTop" class="fa fa-angle-up"></div>
 </aside>
-        
-      </div>
-      <footer id="footer">
-  
-  <div class="outer">
-    <div id="footer-info" class="inner">
-      &copy; 2016 John Doe<br>
-      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+            
+        </div>
+        <footer id="footer">
+    <div class="outer">
+        <div id="footer-info" class="inner">
+            &copy; 2016 John Doe<br>
+            Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>. Theme by <a href="http://github.com/ppoffice">PPOffice</a>
+        </div>
     </div>
-  </div>
 </footer>
-    </div>
-    <nav id="mobile-nav">
-  
-    <a href="/" class="mobile-nav-link">Home</a>
-  
-    <a href="/archives" class="mobile-nav-link">Archives</a>
-  
-</nav>
+        
+
+    
+        <script src="/vendor/fancybox/jquery.fancybox.pack.js"></script>
     
 
-<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 
+<!-- Custom Scripts -->
+<script src="/js/main.js"></script>
 
-  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
-  <script src="/fancybox/jquery.fancybox.pack.js"></script>
-
-
-<script src="/js/script.js"></script>
-
-  </div>
+    </div>
 </body>
 </html>
